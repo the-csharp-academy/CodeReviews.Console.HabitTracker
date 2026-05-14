@@ -8,19 +8,20 @@ void Main() {
     CreateDatabase();
     Console.Clear();
     
-    while (play){
-        switch(Options())
+    while (play) 
+    {
+        switch (Options())
         {
             case 1: // create
                 CreateInput();
                 break;
             case 2: // read
                 break;
-            case 3: //update
+            case 3: // update
                 break;
-            case 4: //delete
+            case 4: // delete
                 break;
-            case 5: //exit
+            case 5: // exit
                 play = false;
                 break;
 
@@ -75,6 +76,8 @@ void CreateDatabase()
     {
         command.ExecuteNonQuery();
     }
+
+    connection.Close();
 }
 
 
@@ -87,6 +90,7 @@ void CreateInput()
     System.Console.WriteLine("Habit Name:");
     string habitName = Console.ReadLine().Trim();
     System.Console.WriteLine();
+    
     System.Console.WriteLine("Quantity:");
     string quantityStr = Console.ReadLine();
     while (!int.TryParse(quantityStr, out habitQuantity))
@@ -96,6 +100,7 @@ void CreateInput()
         quantityStr = Console.ReadLine();
     }
     System.Console.WriteLine();
+
     System.Console.WriteLine("Date: (Tip: use 'Today' for today's date!)");
     string dateStr = Console.ReadLine().Trim().ToLower();
     if (dateStr != "today"){
@@ -118,6 +123,7 @@ void CreateInput()
     System.Console.WriteLine($"Quantity: {habitQuantity}");
     System.Console.WriteLine($"Date: {habitDate}");
     System.Console.WriteLine();
+
     System.Console.WriteLine("Is that correct? (y/n)");
     string userAnswer = Console.ReadLine().Trim().ToLower();
     System.Console.WriteLine();
