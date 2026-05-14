@@ -16,6 +16,7 @@ void Main() {
                 CreateInput();
                 break;
             case 2: // read
+                ReadTable();
                 break;
             case 3: // update
                 break;
@@ -80,6 +81,61 @@ void CreateDatabase()
     connection.Close();
 }
 
+void CreateRow(string habit, int quantity, DateOnly date)
+{
+    string connectionStr = $"Data Source=habits.db";
+
+    Batteries.Init();
+    using var connection = new SqliteConnection(connectionStr); 
+    connection.Open();
+
+    var createInput = $"""
+        INSERT OR IGNORE INTO Habits(Habit, Quantity, Date)
+        VALUES ('{habit}', '{quantity}', '{date.ToString()}');
+        """;
+    
+    using (var command = new SqliteCommand(createInput, connection))
+    {
+        command.ExecuteNonQuery();
+    }
+
+    connection.Close();
+}
+
+void ReadTable()
+{
+    System.Console.WriteLine("** YOUR HABITS **");
+    
+    using var connection = new SqliteConnection("Data Source=habits.db"); 
+    connection.Open();
+    
+    using var command = connection.CreateCommand();
+    command.CommandText = """
+        SELECT Id, 
+              Habit, 
+              Quantity, 
+              Date
+        FROM Habits
+    """;
+    using var reader = command.ExecuteReader();
+
+    while (reader.Read())
+    {
+        var habitId = reader.GetString(0);
+        var habitName = reader.GetString(1);
+        var habitQuantity = reader.GetString(2);
+        var habitDate = reader.GetString(3);
+
+        Console.WriteLine($"ID: {habitId} - HABIT: {habitName} - QUANTITY: {habitQuantity} - DATE: {habitDate}");
+    }
+
+    connection.Close();
+
+    System.Console.WriteLine();
+    System.Console.WriteLine("Press Enter to continue.");
+    Console.ReadKey();
+}
+
 
 
 void CreateInput()
@@ -131,6 +187,7 @@ void CreateInput()
     if (userAnswer == "y")
     {
         System.Console.WriteLine("Saving habit......");
+        CreateRow(habitName, habitQuantity, habitDate);
         System.Console.WriteLine("Saved!");
         System.Console.WriteLine();
         System.Console.WriteLine("Press Enter to continue.");
