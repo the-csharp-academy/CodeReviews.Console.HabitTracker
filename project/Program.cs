@@ -19,6 +19,29 @@ void Main() {
                 ReadTable();
                 break;
             case 3: // update
+                string idStr = "";
+                int idHabit = 0;
+                while(!int.TryParse(idStr, out idHabit))
+                {
+                    System.Console.WriteLine();
+                    System.Console.WriteLine("Input Habit ID to check: ");
+                    idStr = Console.ReadLine();
+                    System.Console.WriteLine();
+                }
+                CheckRow(idHabit);
+                System.Console.WriteLine();
+                System.Console.WriteLine("Is that correct? (y/n)");
+                string answer = Console.ReadLine().Trim().ToLower();
+                System.Console.WriteLine();
+                if (answer == "y")
+                {
+                    updateRow(idHabit);
+                    System.Console.WriteLine();
+                    System.Console.WriteLine("Row updated!");
+                    System.Console.WriteLine("Press Enter to continue.");
+                    Console.ReadKey();
+                }
+
                 break;
             case 4: // delete
                 break;
@@ -92,6 +115,118 @@ void CreateRow(string habit, int quantity, DateOnly date)
     var createInput = $"""
         INSERT OR IGNORE INTO Habits(Habit, Quantity, Date)
         VALUES ('{habit}', '{quantity}', '{date.ToString()}');
+        """;
+    
+    using (var command = new SqliteCommand(createInput, connection))
+    {
+        command.ExecuteNonQuery();
+    }
+
+    connection.Close();
+}
+
+void CheckRow(int id)
+{
+    string connectionStr = $"Data Source=habits.db";
+
+    Batteries.Init();
+    using var connection = new SqliteConnection(connectionStr); 
+    connection.Open();
+
+    using var command = connection.CreateCommand();
+    command.CommandText = $"""
+        SELECT Id, 
+              Habit, 
+              Quantity, 
+              Date
+        FROM Habits
+        WHERE Id = {id};
+        """;
+    using var reader = command.ExecuteReader();
+
+    System.Console.WriteLine("** You Selected: **");
+    while (reader.Read())
+    {
+        var habitId = reader.GetString(0);
+        var habitName = reader.GetString(1);
+        var habitQuantity = reader.GetString(2);
+        var habitDate = reader.GetString(3);
+
+        Console.WriteLine($"ID: {habitId} - HABIT: {habitName} - QUANTITY: {habitQuantity} - DATE: {habitDate}");
+    }
+
+    connection.Close();
+}
+
+void updateRow(int id)
+{
+    string connectionStr = $"Data Source=habits.db";
+
+    Batteries.Init();
+    using var connection = new SqliteConnection(connectionStr); 
+    connection.Open();
+
+    string answer = "";
+    int answerInt = 0;
+    string column = "";
+    string value = "";
+
+    string quantityStr = "";
+    int quantity = 0;
+    DateOnly date;
+    string dateStr = "";
+    
+
+    while (!int.TryParse(answer, out answerInt) || answerInt < 1 || answerInt > 3) 
+    {
+        System.Console.WriteLine("Which value would you like to update?");
+        System.Console.WriteLine("1) Habit name ....................");
+        System.Console.WriteLine("2) Habit quantity ................");
+        System.Console.WriteLine("3) Habit date ....................");
+        System.Console.WriteLine();
+        answer = Console.ReadLine();
+        int.TryParse(answer, out answerInt);
+
+        System.Console.WriteLine();
+    }
+
+    switch (answerInt)
+    {
+        case 1:
+            column = "Habit";
+            System.Console.WriteLine("Input the new name");
+            System.Console.WriteLine();
+            value = Console.ReadLine();
+            break;
+        case 2:
+            column = "Quantity";
+            while (!int.TryParse(quantityStr, out quantity)){
+                System.Console.WriteLine("Input the new quantity");
+                System.Console.WriteLine();
+                quantityStr = Console.ReadLine();
+            }
+            value = quantity.ToString();
+            break;
+        case 3:
+            column = "Date";
+            while (!DateOnly.TryParse(dateStr, out date) || dateStr.ToLower().Trim() != "today" ){
+                System.Console.WriteLine("Input the new date");
+                System.Console.WriteLine();
+                dateStr = Console.ReadLine();
+                if (dateStr.ToLower().Trim() == "today") {
+                    dateStr = DateTime.Today.ToString();
+                    break;
+                }
+            }
+            value = date.ToString();
+            break;
+    }
+
+
+    var createInput = $"""
+            UPDATE Habits
+            SET {column} = {value}
+            WHERE Id = {id};
         """;
     
     using (var command = new SqliteCommand(createInput, connection))
