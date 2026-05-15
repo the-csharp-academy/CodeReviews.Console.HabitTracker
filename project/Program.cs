@@ -4,7 +4,10 @@ using SQLitePCL;
 
 void Main() {
     bool play = true;
-
+    string idStr = "";
+    int idHabit = 0;
+    string answer = "";
+    
     CreateDatabase();
     Console.Clear();
     
@@ -19,8 +22,9 @@ void Main() {
                 ReadTable();
                 break;
             case 3: // update
-                string idStr = "";
-                int idHabit = 0;
+                idStr = "";
+                idHabit = 0;
+
                 while(!int.TryParse(idStr, out idHabit))
                 {
                     System.Console.WriteLine();
@@ -31,19 +35,42 @@ void Main() {
                 CheckRow(idHabit);
                 System.Console.WriteLine();
                 System.Console.WriteLine("Is that correct? (y/n)");
-                string answer = Console.ReadLine().Trim().ToLower();
+                answer = Console.ReadLine().Trim().ToLower();
                 System.Console.WriteLine();
                 if (answer == "y")
                 {
-                    updateRow(idHabit);
+                    UpdateRow(idHabit);
                     System.Console.WriteLine();
                     System.Console.WriteLine("Row updated!");
                     System.Console.WriteLine("Press Enter to continue.");
                     Console.ReadKey();
                 }
-
                 break;
-            case 4: // delete
+            case 4: // delete    
+                idStr = "";
+                idHabit = 0;
+
+                while(!int.TryParse(idStr, out idHabit))
+                {
+                    System.Console.WriteLine();
+                    System.Console.WriteLine("Input Habit ID to check: ");
+                    idStr = Console.ReadLine();
+                    System.Console.WriteLine();
+                }
+                CheckRow(idHabit);
+                System.Console.WriteLine();
+                System.Console.WriteLine("Is that correct? (y/n)");
+                answer = Console.ReadLine().Trim().ToLower();
+                System.Console.WriteLine();
+                if (answer == "y")
+                {
+                    DeleteRow(idHabit);
+                    System.Console.WriteLine();
+                    System.Console.WriteLine("Row deleted!");
+                    System.Console.WriteLine("Press Enter to continue.");
+                    Console.ReadKey();
+                }
+
                 break;
             case 5: // exit
                 play = false;
@@ -158,7 +185,28 @@ void CheckRow(int id)
     connection.Close();
 }
 
-void updateRow(int id)
+void DeleteRow(int id)
+{
+    string connectionStr = $"Data Source=habits.db";
+
+    Batteries.Init();
+    using var connection = new SqliteConnection(connectionStr); 
+    connection.Open();
+
+    var createInput = $"""
+            DELETE FROM Habits
+            WHERE Id = {id};
+        """;
+    
+    using (var command = new SqliteCommand(createInput, connection))
+    {
+        command.ExecuteNonQuery();
+    }
+
+    connection.Close();
+}
+
+void UpdateRow(int id)
 {
     string connectionStr = $"Data Source=habits.db";
 
