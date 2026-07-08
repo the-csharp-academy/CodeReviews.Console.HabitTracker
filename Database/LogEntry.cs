@@ -1,0 +1,188 @@
+﻿
+using Microsoft.Data.Sqlite;
+using Spectre.Console;
+using System.Globalization;
+
+namespace HabitsLogger.Database;
+
+/// <summary>
+/// DB-record of log of some habit
+/// </summary>
+internal class LogEntry : DataEntry
+{
+   public int HabitId { get; set; }
+   public string Date { get; set; } = string.Empty;
+   public int Quantity { get; set; }
+   public string QuantityDesc { get; set; } = string.Empty;
+
+   public LogEntry ()
+   {
+      // Create commands which will be used to create, delete and update some records in table "habits"
+      cmdAdd = (SqliteCommand cmd) =>
+      {
+         cmd.CommandText = "INSERT INTO log (HabitId, Date, Quantity) VALUES (@habitId, @date, @quantity)";
+         cmd.Parameters.AddWithValue ("@habitId", HabitId);
+         cmd.Parameters.AddWithValue ("@date", ConvertDateToDbFormat (Date));
+         cmd.Parameters.AddWithValue ("@quantity", Quantity);
+         cmd.ExecuteNonQuery ();
+      };
+
+      cmdDelete = (SqliteCommand cmd) =>
+      {
+         cmd.CommandText = "DELETE FROM log WHERE Id = @Id";
+         cmd.Parameters.AddWithValue ("@Id", Id);
+         cmd.ExecuteNonQuery ();
+      };
+
+      cmdUpdate = (SqliteCommand cmd) =>
+      {
+         cmd.CommandText = "UPDATE log SET Date = @date, Quantity = @quantity WHERE Id = @Id";
+         cmd.Parameters.AddWithValue ("@date", ConvertDateToDbFormat (Date));
+         cmd.Parameters.AddWithValue ("@quantity", Quantity);
+         cmd.Parameters.AddWithValue ("@Id", Id);
+         cmd.ExecuteNonQuery ();
+      };
+   }
+
+   /// <summary>
+   /// Transfers data from SqliteDataReader to habit-record
+   /// </summary>
+   /// <param name="reader"></param>
+   public override void GetData (SqliteDataReader reader)
+   {
+      Id = reader.GetInt32 (0);
+      Date = ConvertDateFromDbFormat (reader.GetString (1));
+      Quantity = reader.GetInt32 (2);
+      QuantityDesc = reader.GetString (3);
+   }
+
+   /// <summary>
+   /// Converts date from "YYYYMMDD" to "DD-MM-YYYY"
+   /// </summary>
+   /// <param name="date"></param>
+   /// <returns></returns>
+   static string ConvertDateFromDbFormat (string date)
+   {
+      return date.Substring (6, 2) + "-" + date.Substring (4, 2) + "-" + date.Substring (0, 4);
+   }
+   
+   /// <summary>
+   /// Converts date from "DD-MM-YY" or "DD-MM-YYYY" to "YYYYMMDD"
+   /// </summary>
+   /// <param name="date"></param>
+   /// <param name="fullYear"></param>
+   /// <returns></returns>
+   static string ConvertDateToDbFormat (string date, bool fullYear = true)
+   {
+      string year = !fullYear ? "20" + date.Substring (6, 2) : date.Substring (6, 4);
+      return year + date.Substring (3, 2) + date.Substring (0, 2);
+   }
+
+   /// <summary>
+   /// Checks, if the inputed date is in correct format. If not, retuurns empty string, otherwise return date in format "DD-MM-YYYY" 
+   /// </summary>
+   /// <param name="date"></param>
+   /// <returns></returns>
+   public static string ParseDate (string date)
+   {
+      if (date.Trim ().ToLower () == "now")
+         return DateTime.Now.ToString ("dd-MM-yyyy");
+
+      if (!DateTime.TryParseExact (date, "dd-MM-yy", new CultureInfo ("en-US"), DateTimeStyles.None, out var _))
+         return string.Empty;
+
+      return ConvertDateFromDbFormat (ConvertDateToDbFormat (date, false));
+   }
+
+   public static int ParseQuantity (string value)
+   {
+      if (!Int32.TryParse (value, out int res))
+         return -1;
+
+      return res;
+   }
+
+   public override void AppendToTable (int id, Table table)
+   {
+      table.AddRow (id.ToString (), Date, $"{Quantity} {QuantityDesc}");
+   }
+
+   public override void UpdateLine (int currentLine, Table? table, bool showSelected)
+   {
+      if (table == null)
+         return;
+
+      string [] texts = { ConvertText ((currentLine + 1).ToString (), showSelected),
+                          ConvertText (Date, showSelected),
+                          ConvertText ($"{Quantity} {QuantityDesc}", showSelected)};
+
+      for (int i = 0; i < texts.Length; ++i)
+         table.UpdateCell (currentLine, i, new Markup (texts [i]));
+   }
+
+   public override void UpdateCell (int currentLine, int currentColumn, Table? table, bool showSelected)
+   {
+      if (table == null)
+         return;
+
+      string text = currentColumn switch
+      {
+         0 => (currentLine + 1).ToString (),
+         1 => Date,
+         2 => $"{Quantity} {QuantityDesc}",
+         _ => string.Empty
+      };
+
+      if (showSelected)
+         text = $"[black on yellow]{text}[/]";
+
+      table.UpdateCell (currentLine, currentColumn, new Markup (text));
+   }
+
+   public override Tuple<string, string> GetProperty (int index)
+   {
+      return index switch
+      {
+         0 => Tuple.Create ("Nr", Id.ToString ()),
+         1 => Tuple.Create ("Date", Date),
+         2 => Tuple.Create ("Quantity", Quantity.ToString ()),
+         _ => Tuple.Create (string.Empty, string.Empty)
+      };
+   }
+
+   public override string SetProperty (int index, string value)
+   {
+      switch (index)
+      {
+         case 1:
+            string date = ParseDate (value);
+            if (string.IsNullOrEmpty (date))
+               return "The parameter 'Date' is incorrect. Expecting date in format 'dd-mm-yy'";
+
+            Date = date;
+            break;
+
+         case 2:
+            int res = ParseQuantity (value);
+            if (res < 0)
+               return "The parameter 'Quantity' is incorrect (not negative number expected)";
+
+            Quantity = res;
+            break;
+      }
+
+      return string.Empty;
+   }
+
+   /// <summary>
+   /// For logs will be no check for unicity performed - some logs of one hhabit may have the same date
+   /// </summary>
+   /// <param name="index"></param>
+   /// <param name="value"></param>
+   /// <param name="entries"></param>
+   /// <returns></returns>
+   public override bool CheckIfUnique (int index, string value, List<DataEntry> entries)
+   {
+      return true;
+   }
+}

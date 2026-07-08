@@ -1,0 +1,2 @@
+﻿
+new HabitsLogger.App ().Run (); 
