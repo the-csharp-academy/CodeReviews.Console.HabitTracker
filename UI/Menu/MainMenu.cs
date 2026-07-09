@@ -3,9 +3,6 @@ using HabitsLogger.UI.Table;
 
 namespace HabitsLogger.UI.Menu;
 
-/// <summary>
-/// Main menu of application
-/// </summary>
 internal class MainMenu : ConsoleMenu
 {
    public MainMenu ()

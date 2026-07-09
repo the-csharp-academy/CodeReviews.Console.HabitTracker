@@ -73,7 +73,7 @@ internal abstract class DataTable
       if (_mode == ProcesMode.View)
          ShowTableData ();
       else
-         Select (); // Show table and selecr first record
+         Select ();
 
       ProcessInput ();
    }
@@ -185,12 +185,7 @@ internal abstract class DataTable
       }
    }
 
-   /// <summary>
-   /// Navigation - move actual selection from top to bottom or vise versa
-   /// </summary>
-   /// <param name="moveUp"></param>
-   /// <param name="moveToLimit"></param>
-   void MoveVertical (bool moveUp, bool moveToLimit = false)
+      void MoveVertical (bool moveUp, bool moveToLimit = false)
    {
       Deselect ();
 
@@ -220,11 +215,6 @@ internal abstract class DataTable
       Select ();
    }
 
-   /// <summary>
-   /// Navigation - move actual selection from left to right or vise versa
-   /// </summary>
-   /// <param name="moveLeft"></param>
-   /// <param name="moveToLimit"></param>
    void MoveHorizontal (bool moveLeft, bool moveToLimit = false)
    {
       if (_mode != ProcesMode.Update)
@@ -258,16 +248,11 @@ internal abstract class DataTable
       Select ();
    }
 
-   /// <summary>
-   /// Shows actial line or cell as selected
-   /// </summary>
    void Select ()
    {
       if (_entries == null)
          return;
 
-      // In mode "delete" will be selected entire line of table.
-      // In mode "update" will be selected only one cell
       var entry = _entries [_selectedLine];
       if (_mode == ProcesMode.Delete)
          entry.UpdateLine (_selectedLine, _table, showSelected: true);
@@ -290,10 +275,6 @@ internal abstract class DataTable
          entry.UpdateCell (_selectedLine, _selectedColumn, _table, showSelected: false);
    }
 
-   /// <summary>
-   /// Deletes actual selected record from table and from database
-   /// </summary>
-   /// <returns></returns>
    bool DeleteCurrentLine ()
    {
       if (_mode != ProcesMode.Delete || _entries == null || _table == null)
@@ -322,9 +303,6 @@ internal abstract class DataTable
       return true;
    }
 
-   /// <summary>
-   /// Support for updating data in selected cell
-   /// </summary>
    void Update ()
    {
       if (_mode != ProcesMode.Update || _entries == null || _entries.Count <= 0)
@@ -346,7 +324,6 @@ internal abstract class DataTable
          if (string.IsNullOrEmpty (newValue))
             break;
 
-         // Some values must be unique. We check, if it is so for newly entered data
          if (!entry.CheckIfUnique (_selectedColumn, newValue, _entries))
          {
             Gui.Exception ("There is already data with this value. Please enter another value for this property.");

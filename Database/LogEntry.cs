@@ -1,13 +1,9 @@
-﻿
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Spectre.Console;
 using System.Globalization;
 
 namespace HabitsLogger.Database;
 
-/// <summary>
-/// DB-record of log of some habit
-/// </summary>
 internal class LogEntry : DataEntry
 {
    public int HabitId { get; set; }
@@ -17,7 +13,6 @@ internal class LogEntry : DataEntry
 
    public LogEntry ()
    {
-      // Create commands which will be used to create, delete and update some records in table "habits"
       cmdAdd = (SqliteCommand cmd) =>
       {
          cmd.CommandText = "INSERT INTO log (HabitId, Date, Quantity) VALUES (@habitId, @date, @quantity)";
@@ -175,7 +170,7 @@ internal class LogEntry : DataEntry
    }
 
    /// <summary>
-   /// For logs will be no check for unicity performed - some logs of one hhabit may have the same date
+   /// For logs we perform no check for unicity - some logs of one habit may have the same date
    /// </summary>
    /// <param name="index"></param>
    /// <param name="value"></param>

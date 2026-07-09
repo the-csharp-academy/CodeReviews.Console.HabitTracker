@@ -1,12 +1,8 @@
-﻿
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Spectre.Console;
 
 namespace HabitsLogger.Database;
 
-/// <summary>
-/// DB-Entry of some habit
-/// </summary>
 internal class HabitEntry : DataEntry
 {
    public string Description { get; set; } = string.Empty;
@@ -14,7 +10,6 @@ internal class HabitEntry : DataEntry
 
    public HabitEntry ()
    {
-      // Create commands which will be used to create, delete and update some records in table "habits"
       cmdAdd = (SqliteCommand cmd) =>
       {
          cmd.CommandText = "INSERT INTO habits (Description, QuantityDesc) VALUES (@desc, @quantityDesc)";

@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Spectre.Console;
 
 namespace HabitsLogger.Database;

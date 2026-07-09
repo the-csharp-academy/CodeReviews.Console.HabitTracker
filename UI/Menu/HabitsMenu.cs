@@ -1,11 +1,9 @@
 ﻿using HabitsLogger.Database;
 using HabitsLogger.UI.Table;
 using Spectre.Console;
+
 namespace HabitsLogger.UI.Menu;
 
-/// <summary>
-/// Menu of all habits
-/// </summary>
 internal class HabitsMenu : ConsoleMenu
 {
    public HabitsMenu (string title, DataTable.ProcesMode mode)
@@ -28,11 +26,6 @@ internal class HabitsMenu : ConsoleMenu
       AddItem ("<Back to previous menu>", (item) => { return true; });
    }
 
-   /// <summary>
-   /// Display all logs of selected habit
-   /// </summary>
-   /// <param name="item"></param>
-   /// <returns></returns>
    bool ViewLogs (string item)
    {
       LogTable table = new (item);
@@ -40,11 +33,6 @@ internal class HabitsMenu : ConsoleMenu
       return false;
    }
 
-   /// <summary>
-   /// Append a new log to selected habit
-   /// </summary>
-   /// <param name="item"></param>
-   /// <returns></returns>
    bool AddLog (string item)
    {
       HashSet<string> names = new ();
@@ -121,11 +109,6 @@ internal class HabitsMenu : ConsoleMenu
       return false;
    }
 
-   /// <summary>
-   /// Show all logs of habit to delete from database
-   /// </summary>
-   /// <param name="item"></param>
-   /// <returns></returns>
    bool DeleteLog (string item)
    {
       LogTable table = new LogTable (item, DataTable.ProcesMode.Delete);
@@ -134,11 +117,6 @@ internal class HabitsMenu : ConsoleMenu
       return false;
    }
 
-   /// <summary>
-   /// Show all logs of habit to update their data
-   /// </summary>
-   /// <param name="item"></param>
-   /// <returns></returns>
    bool UpdateLog (string item)
    {
       LogTable table = new LogTable (item, DataTable.ProcesMode.Update);

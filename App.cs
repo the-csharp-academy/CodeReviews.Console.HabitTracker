@@ -1,5 +1,4 @@
-﻿
-using HabitsLogger.Database;
+﻿using HabitsLogger.Database;
 using HabitsLogger.UI;
 using Spectre.Console;
 
