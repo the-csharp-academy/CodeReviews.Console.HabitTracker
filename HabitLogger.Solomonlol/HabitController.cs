@@ -21,7 +21,7 @@ namespace STUDY.HabitLogger
 
                 commandSQL.CommandText = @"CREATE TABLE IF NOT EXISTS Habits" +
                     "(Id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "Habit TEXT NOT NULL UNIQUE," +
+                    "Habit TEXT NOT NULL," +
                     "Quantity INTEGER NOT NULL," +
                     "Date TEXT)";
                 commandSQL.ExecuteNonQuery();
@@ -42,23 +42,17 @@ namespace STUDY.HabitLogger
                 connection.Open();
                 var commandSQL = connection.CreateCommand();
 
-                commandSQL.CommandText = @$"INSERT INTO Habits (Habit, Quantity, Date) VALUES (@habit, @qty, @date) ON CONFLICT (Habit) DO NOTHING";
+                commandSQL.CommandText = @$"INSERT INTO Habits (Habit, Quantity, Date) VALUES (@habit, @qty, @date)";
                 commandSQL.Parameters.Clear();
                 commandSQL.Parameters.AddWithValue("@habit", habit);
                 commandSQL.Parameters.AddWithValue("@qty", quantity);
                 commandSQL.Parameters.AddWithValue("date", date.ToString());
-                int checkSQL = commandSQL.ExecuteNonQuery();
+                commandSQL.ExecuteNonQuery();
 
-                if (checkSQL == 0)
-                {
-                    Console.WriteLine($"Record whith habit name='{habit}' already exist.\nPress any key to continue...");
-                    Console.ReadKey();
-                }
-                else
-                {
-                    Console.WriteLine($"Record whith habit name='{habit}' was created.\nPress any key to continue...");
-                    Console.ReadKey();
-                }
+                
+                Console.WriteLine($"Record whith habit name='{habit}' was created.\nPress any key to continue...");
+                Console.ReadKey();
+                
                 connection.Close();
             }
         }
