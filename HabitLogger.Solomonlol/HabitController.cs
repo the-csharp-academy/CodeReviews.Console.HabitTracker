@@ -42,8 +42,11 @@ namespace STUDY.HabitLogger
                 connection.Open();
                 var commandSQL = connection.CreateCommand();
 
-                commandSQL.CommandText = @$"INSERT INTO Habits (Habit, Quantity, Date) VALUES ('{habit}', {quantity}, '{date}') ON CONFLICT (Habit) DO NOTHING";
-
+                commandSQL.CommandText = @$"INSERT INTO Habits (Habit, Quantity, Date) VALUES (@habit, @qty, @date) ON CONFLICT (Habit) DO NOTHING";
+                commandSQL.Parameters.Clear();
+                commandSQL.Parameters.AddWithValue("@habit", habit);
+                commandSQL.Parameters.AddWithValue("@qty", quantity);
+                commandSQL.Parameters.AddWithValue("date", date.ToString());
                 int checkSQL = commandSQL.ExecuteNonQuery();
 
                 if (checkSQL == 0)
@@ -68,21 +71,33 @@ namespace STUDY.HabitLogger
                 connection.Open();
                 var commandSQL = connection.CreateCommand();
                 NumberInput("Write record ID to update", out int id);
-                NumberInput("Set new quantity", out int quantity);
-                DateInput("Set new date", out DateTime date);
-
-                commandSQL.CommandText = $@"UPDATE Habits SET Quantity='{quantity}', Date='{date}' WHERE Id='{id}'";
-                int checkSQL = commandSQL.ExecuteNonQuery();
-
-                if (checkSQL == 0)
+                commandSQL.CommandText = "SELECT EXISTS(SELECT 1 FROM Habits WHERE Id=@id)";
+                commandSQL.Parameters.Clear();
+                commandSQL.Parameters.AddWithValue("@id", id);
+                using (var reader = commandSQL.ExecuteReader())
                 {
-                    Console.WriteLine($"Record whit ID='{id}' dosn't exist.\nPress any key to continue...");
-                    Console.ReadKey();
-                }
-                else
-                {
-                    Console.WriteLine($"Record whith ID='{id}' was updated.\nPress any key to continue...");
-                    Console.ReadKey();
+                    reader.Read(); 
+                    bool exists = reader.GetBoolean(0);  
+                    reader.Close();
+                    if (!exists)
+                    {
+                        Console.WriteLine($"Record whith ID='{id}' dosn't exist.\nPress any key to continue...");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
+                        NumberInput("Set new quantity", out int quantity);
+                        DateInput("Set new date", out DateTime date);
+
+                        commandSQL.CommandText = $@"UPDATE Habits SET Quantity=@qty, Date=@date WHERE Id=@id";
+                        commandSQL.Parameters.AddWithValue("@qty", quantity);
+                        commandSQL.Parameters.AddWithValue("@date", date.ToString());
+                        commandSQL.ExecuteNonQuery();
+
+
+                        Console.WriteLine($"Record whith ID='{id}' was updated.\nPress any key to continue...");
+                        Console.ReadKey();
+                    }
                 }
                 connection.Close();
             }
@@ -144,7 +159,9 @@ namespace STUDY.HabitLogger
                 var commandSQL = connection.CreateCommand();
 
 
-                commandSQL.CommandText = $"DELETE FROM Habits WHERE Id='{id}'";
+                commandSQL.CommandText = $"DELETE FROM Habits WHERE Id=@id";
+                commandSQL.Parameters.Clear();
+                commandSQL.Parameters.AddWithValue("id", id);
                 int checkSQL = commandSQL.ExecuteNonQuery();
 
                 if (checkSQL == 0)
@@ -188,5 +205,7 @@ namespace STUDY.HabitLogger
                 Console.WriteLine("Wrong data format. The string must contain only characters from the Russian or Latin alphabets. Try again.");
             }
         }
+
+        
     }
 }

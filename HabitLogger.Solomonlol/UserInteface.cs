@@ -23,9 +23,9 @@ namespace STUDY.HabitLogger
                 Console.WriteLine("4.Delete habit.");
                 Console.WriteLine("0.Exit.");
                 int operation;
-                while (!int.TryParse(Console.ReadLine(), out operation))
+                while (!int.TryParse(Console.ReadLine(), out operation) || operation>4 || operation<0)
                 {
-                    Console.WriteLine("Wrong data format. Try again.");
+                    Console.WriteLine("Wrong data format. The string must contain only digits in [0-4] range. Try again.");
                 }
 
                 switch((MainMenu)operation)
