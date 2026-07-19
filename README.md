@@ -1,8 +1,12 @@
-This is application that can create, update, delete and view records of habits in database.
-When app is started its create database with name HabitLogger.db. After that its create table Habits in it. 
-User can see main menu with 5 choises: View, Add, Update, Delete and Exit.
-Exit is just for closing app.
-View - show all data in databse if it exists. Or show message that database is empty.
-Add - create new record. Input data is required to be correct.
-Update - update existed record or show message if not exists. Input data is required to be correct.
-Delete - delete existed record or show message if not exists. Input data is required to be correct.
+This application allows you to create, update, delete, and view habit records in the database.
+Upon startup, the application creates a database named `HabitLogger.db` and a `Habits` table within it.
+The user has access to a main menu with five options: "View," "Add," "Update," "Delete," and "Exit."
+"Exit" — terminates the application.
+"View" — displays all data from the database (if any exist) or a message stating that the database is empty.
+"Add" — creates a new record; the input data must be valid
+Update — updates an existing record or displays a message if it does not exist. Input data must be valid.
+Delete — deletes an existing record or displays a message if it does not exist. Input data must be valid.
+
+
+A bit about the process:
+The task was not difficult, but it was time-consuming. However, I learned a lot in the process.
