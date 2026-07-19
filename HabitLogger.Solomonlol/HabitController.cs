@@ -65,6 +65,7 @@ namespace STUDY.HabitLogger
 
         public static void UpdateDbData()
         {
+            Console.Clear();
             GetDbData(false);
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -79,6 +80,7 @@ namespace STUDY.HabitLogger
                     reader.Read(); 
                     bool exists = reader.GetBoolean(0);  
                     reader.Close();
+
                     if (!exists)
                     {
                         Console.WriteLine($"Record whith ID='{id}' dosn't exist.\nPress any key to continue...");
@@ -149,6 +151,7 @@ namespace STUDY.HabitLogger
         }
         public static void DeleteDbData()
         {
+            Console.Clear();
             GetDbData(false);
             using (var connection = new SqliteConnection(connectionString))
             {
