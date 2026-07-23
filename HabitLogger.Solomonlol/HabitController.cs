@@ -43,7 +43,7 @@ namespace STUDY.HabitLogger
                 commandSQL.Parameters.Clear();
                 commandSQL.Parameters.AddWithValue("@habit", habit);
                 commandSQL.Parameters.AddWithValue("@qty", quantity);
-                commandSQL.Parameters.AddWithValue("date", date.ToString());
+                commandSQL.Parameters.AddWithValue("date", date.ToString("dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture));
                 commandSQL.ExecuteNonQuery();
 
                 
@@ -84,7 +84,7 @@ namespace STUDY.HabitLogger
 
                         commandSQL.CommandText = $@"UPDATE Habits SET Quantity=@qty, Date=@date WHERE Id=@id";
                         commandSQL.Parameters.AddWithValue("@qty", quantity);
-                        commandSQL.Parameters.AddWithValue("@date", date.ToString());
+                        commandSQL.Parameters.AddWithValue("@date", date.ToString("dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture));
                         commandSQL.ExecuteNonQuery();
 
 
