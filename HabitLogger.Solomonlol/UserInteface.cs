@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using static STUDY.HabitLogger.Enums;
+﻿using static STUDY.HabitLogger.Enums;
 using static STUDY.HabitLogger.HabitController;
 
 namespace STUDY.HabitLogger

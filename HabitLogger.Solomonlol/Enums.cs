@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace STUDY.HabitLogger
+﻿namespace STUDY.HabitLogger
 {
     public class Enums
     {
