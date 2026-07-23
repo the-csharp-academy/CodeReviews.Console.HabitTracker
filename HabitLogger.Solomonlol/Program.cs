@@ -1,6 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
-using STUDY.HabitLogger;
-using System.Data;
+﻿using STUDY.HabitLogger;
 
 
 UserInteface ui = new UserInteface();

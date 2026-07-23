@@ -37,7 +37,7 @@ namespace STUDY.HabitLogger
 
                 HabitInput("Write habit name:", out string habit);
                 NumberInput("Write habit quantity:", out int quantity);
-                DateInput("Write a date in 'dd-MM-yyyy' format:", out DateTime date);
+                DateInput("Write a date in 'dd.MM.yyyy' format:", out DateTime date);
 
                 connection.Open();
                 var commandSQL = connection.CreateCommand();
@@ -121,7 +121,7 @@ namespace STUDY.HabitLogger
                                     (reader.GetInt32(0),
                                     reader.GetString(1),
                                     reader.GetInt32(2),
-                                    DateOnly.FromDateTime(DateTime.ParseExact(reader.GetString(3), "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture))
+                                    DateOnly.ParseExact(reader.GetString(3).Trim(), "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture)
                                     ));
                         }
                         Console.WriteLine("===================================================");
@@ -187,6 +187,7 @@ namespace STUDY.HabitLogger
 
         private static void DateInput(string s, out DateTime date)
         {
+            
             Console.WriteLine(s);
             while (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
             {
