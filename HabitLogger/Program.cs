@@ -38,7 +38,7 @@ using (var connection = new SqliteConnection(connectionString))
     connection.Close();
 }
 
-//FillTable(connectionString);
+FillTable(connectionString);
 Menu(connectionString, extraColumns);
 
 static void Menu(string connectionString, List<string>? extraColumns)
@@ -117,7 +117,6 @@ static void ViewAllEntries(string connectionString, List<string>? extraColumns)
     using (var connection = new SqliteConnection(connectionString))
     {
 
-
         connection.Open();
         var cmd = connection.CreateCommand();
         cmd.CommandText = @"SELECT * FROM Habit_Logger";
@@ -129,7 +128,6 @@ static void ViewAllEntries(string connectionString, List<string>? extraColumns)
             while (reader.Read())
             {
                 string extra = "";
-
 
                 int id = reader.GetInt32(0);
                 string date = reader.GetString(1);
@@ -146,12 +144,10 @@ static void ViewAllEntries(string connectionString, List<string>? extraColumns)
                     extra += $", {colName}: {value}";
                 }
 
-
                 Console.Write($"{id} - {date}: Glasses of water: {water}, steps: {steps}");
                 Console.WriteLine(extra);
             }
         }
-
 
         connection.Close();
     }
@@ -163,11 +159,9 @@ static void AddEntry(string connectionString, List<string>? extraColumns)
     string fields = "Date, WaterQuantity, StepsQuantity";
     string values = "@date, @water, @steps";
 
-
     string date = GetUserDate("\nInsert the date (format: yyyy-MM-dd)");
     int water = GetUserInt("\nInsert number of water glasses you drank");
     int steps = GetUserInt("\nInsert number of steps taken");
-
 
     for (int i = 0; i < extraColumns?.Count; i++)
     {
@@ -175,7 +169,6 @@ static void AddEntry(string connectionString, List<string>? extraColumns)
         extraValues.Add(GetUserInt($"\ninsert a value for: {extraColumns[i]}"));
         values += $", @extra{i}";
     }
-
 
     using (var connection = new SqliteConnection(connectionString))
     {
@@ -328,17 +321,14 @@ static string GetUserDate(string message)
     do
     {
 
-
         Console.WriteLine(message);
         date = Console.ReadLine();
         validDate = DateTime.TryParseExact(date, "yyyy-MM-dd", new CultureInfo("en-US"), DateTimeStyles.None, out _);
-
 
         if (!validDate)
         {
             Console.WriteLine("Invalid input. Make sure the format is -> \"yyyy-MM-dd\" ");
         }
-
 
     } while (!validDate);
 
