@@ -1,12 +1,9 @@
 ﻿using System.Globalization;
 using Microsoft.Data.Sqlite;
 
-
 string connectionString = @"Data Source=HabitLogger.db";
 
-
 List<string>? extraColumns = new List<string>();
-
 
 using (var connection = new SqliteConnection(connectionString))
 {
@@ -21,7 +18,6 @@ using (var connection = new SqliteConnection(connectionString))
     cmd.ExecuteNonQuery();
     connection.Close();
 }
-
 
 using (var connection = new SqliteConnection(connectionString))
 {
@@ -42,10 +38,8 @@ using (var connection = new SqliteConnection(connectionString))
     connection.Close();
 }
 
-
-FillTable(connectionString);
+//FillTable(connectionString);
 Menu(connectionString, extraColumns);
-
 
 static void Menu(string connectionString, List<string>? extraColumns)
 {
@@ -67,88 +61,51 @@ static void Menu(string connectionString, List<string>? extraColumns)
         string? userInput = Console.ReadLine();
         Console.WriteLine();
 
-
-        switch (userInput)
+        try
         {
-            case "0":
-                Console.WriteLine("Goodbye!");
-                wantToExit = true;
-                break;
+            switch (userInput)
+            {
+                case "0":
+                    Console.WriteLine("Goodbye!");
+                    wantToExit = true;
+                    break;
 
+                case "1":
 
-            case "1":
-                try
-                {
                     ViewAllEntries(connectionString, extraColumns);
                     break;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    break;
-                }
 
+                case "2":
 
-            case "2":
-                try
-                {
                     AddEntry(connectionString, extraColumns);
                     break;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    break;
-                }
 
+                case "3":
 
-            case "3":
-                try
-                {
                     DeleteEntry(connectionString, extraColumns);
                     break;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    break;
-                }
 
-
-            case "4":
-                try
-                {
+                case "4":
                     UpdateEntry(connectionString, extraColumns);
                     break;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    break;
-                }
 
-
-            case "5":
-                try
-                {
+                case "5":
                     AddHabit(connectionString, extraColumns);
                     break;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
+
+                default:
+                    Console.WriteLine("Invalid Input.");
                     break;
-                }
-
-            default:
-                Console.WriteLine("Invalid Input.");
-                break;
+            }
         }
-
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            continue;
+        }
 
     } while (wantToExit == false);
 }
-
 
 static void ViewAllEntries(string connectionString, List<string>? extraColumns)
 {
@@ -200,7 +157,6 @@ static void ViewAllEntries(string connectionString, List<string>? extraColumns)
     }
 }
 
-
 static void AddEntry(string connectionString, List<string>? extraColumns)
 {
     List<int> extraValues = new List<int>();
@@ -239,51 +195,36 @@ static void AddEntry(string connectionString, List<string>? extraColumns)
     Console.WriteLine("\nEntry added successfully!\n");
 }
 
-
 static void DeleteEntry(string connectionString, List<string>? extraColumns)
 {
-    ViewAllEntries(connectionString, extraColumns);
-
-
-    int id = GetUserInt("\nEnter the ID of the entry you want to delete:");
-
+    int id = GetID(connectionString, extraColumns, "\nEnter the ID of the entry you want to delete:");
+    if(id == -1)
+    {
+        return;
+    }
 
     using (var connection = new SqliteConnection(connectionString))
     {
         connection.Open();
         var cmd = connection.CreateCommand();
-
-
+        cmd.CommandText = $"DELETE FROM Habit_Logger WHERE id = @id";
         cmd.Parameters.AddWithValue("@id", id);
-        cmd.CommandText = $"SELECT EXISTS(SELECT 1 FROM Habit_Logger WHERE id = @id)";
-        int exists = Convert.ToInt32(cmd.ExecuteScalar());
-        if (exists == 0)
-        {
-            Console.WriteLine("\nRecord does not exists");
-        }
-        else
-        {
-            cmd.CommandText = $"DELETE FROM Habit_Logger WHERE id = @id";
-            cmd.ExecuteNonQuery();
-            Console.WriteLine("\nEntry deleted successfully!\n");
-        }
+        cmd.ExecuteNonQuery();
+        Console.WriteLine("\nEntry deleted successfully!\n");
         connection.Close();
     }
 }
-
 
 static void UpdateEntry(string connectionString, List<string>? extraColumns)
 {
-    ViewAllEntries(connectionString, extraColumns);
-
+    int id = GetID(connectionString, extraColumns, "\nEnter the ID of the entry you want to update:");
+    if(id == -1)
+    {
+        return;
+    }
 
     string variables = "WaterQuantity = @water, StepsQuantity = @steps";
-
-
     List<int> extraValues = new List<int>();
-
-
-    int id = GetUserInt("\nEnter the ID of the entry you want to update:");
 
 
     using (var connection = new SqliteConnection(connectionString))
@@ -291,43 +232,28 @@ static void UpdateEntry(string connectionString, List<string>? extraColumns)
         connection.Open();
         var cmd = connection.CreateCommand();
 
+        int water = GetUserInt("\nInsert new number of water glasses you drank");
+        int steps = GetUserInt("\nInsert new number of steps taken");
 
+        for (int i = 0; i < extraColumns?.Count; i++)
+        {
+            extraValues.Add(GetUserInt($"\nInsert new value for: {extraColumns[i]}"));
+            variables += $", {extraColumns[i]} = @{extraColumns[i]}";
+        }
+
+        cmd.CommandText = $"UPDATE Habit_Logger SET {variables} WHERE id = @id";
         cmd.Parameters.AddWithValue("@id", id);
-        cmd.CommandText = $"SELECT EXISTS(SELECT 1 FROM Habit_Logger WHERE id = @id)";
-        int exists = Convert.ToInt32(cmd.ExecuteScalar());
-        if (exists == 0)
+        cmd.Parameters.AddWithValue("@water", water);
+        cmd.Parameters.AddWithValue("@steps", steps);
+        for (int i = 0; i < extraColumns?.Count; i++)
         {
-            Console.WriteLine("\nRecord does not exists");
+            cmd.Parameters.AddWithValue($"@{extraColumns[i]}", extraValues[i]);
         }
-        else
-        {
-
-
-            int water = GetUserInt("\nInsert new number of water glasses you drank");
-            int steps = GetUserInt("\nInsert new number of steps taken");
-
-
-            for (int i = 0; i < extraColumns?.Count; i++)
-            {
-                extraValues.Add(GetUserInt($"\nInsert new value for: {extraColumns[i]}"));
-                variables += $", {extraColumns[i]} = @{extraColumns[i]}";
-            }
-
-
-            cmd.CommandText = $"UPDATE Habit_Logger SET {variables} WHERE id = @id";
-            cmd.Parameters.AddWithValue("@water", water);
-            cmd.Parameters.AddWithValue("@steps", steps);
-            for (int i = 0; i < extraColumns?.Count; i++)
-            {
-                cmd.Parameters.AddWithValue($"@{extraColumns[i]}", extraValues[i]);
-            }
-            cmd.ExecuteNonQuery();
-            Console.WriteLine("Entry updated successfully!\n");
-        }
+        cmd.ExecuteNonQuery();
+        Console.WriteLine("Entry updated successfully!\n");
         connection.Close();
     }
 }
-
 
 static void AddHabit(string connectionString, List<string>? extraColumns)
 {
@@ -354,6 +280,29 @@ static void AddHabit(string connectionString, List<string>? extraColumns)
     extraColumns?.Add(newHabit);
 }
 
+static int GetID(string connectionString, List<string>? extraColumns, string message)
+{
+    ViewAllEntries(connectionString, extraColumns);
+    int id = GetUserInt(message);
+
+    using (var connection = new SqliteConnection(connectionString))
+    {
+        connection.Open();
+        var cmd = connection.CreateCommand();
+
+
+        cmd.Parameters.AddWithValue("@id", id);
+        cmd.CommandText = $"SELECT EXISTS(SELECT 1 FROM Habit_Logger WHERE id = @id)";
+        int exists = Convert.ToInt32(cmd.ExecuteScalar());
+        if (exists == 0)
+        {
+            Console.WriteLine("\nRecord does not exists.");
+            return -1;
+        }
+        connection.Close();
+        return id;
+    }
+}
 
 static int GetUserInt(string message)
 {
@@ -371,7 +320,6 @@ static int GetUserInt(string message)
     }
     return value;
 }
-
 
 static string GetUserDate(string message)
 {
@@ -398,9 +346,7 @@ static string GetUserDate(string message)
     return date!;
 }
 
-
 //METHOD TO FILL THE TABLE WITH 50 ENTRIES
-
 static void FillTable(string connectionString)
 {
     Random random = new Random();
