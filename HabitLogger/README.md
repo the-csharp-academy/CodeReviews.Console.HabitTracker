@@ -44,7 +44,7 @@ From the main menu the user can:
 
 ## Challenges
 
-**Dynamic SQL** was the biggest challenge. Since users can add custom habits that become new database columns, every INSERT and UPDATE query needs to be built at runtime. Column names can't use SQL parameters, so they require Regex validation to prevent injection instead.
+**Dynamic SQL** was the biggest challenge. Since users can add custom habits that become new database columns, every INSERT and UPDATE query needs to be built at runtime. For habit name validation I initially used Regex, but later switched to `string.IsNullOrWhiteSpace` combined with `newHabit.All(char.IsLetterOrDigit)`, which I found cleaner for this case.
 
 **SQLite and ADO.NET** were both new to me. I started by following the project guide, then repeated the project three additional times on my own to get comfortable with all the required commands.
 
@@ -68,4 +68,3 @@ From the main menu the user can:
 - Using `PRAGMA table_info` to read and restore table structure across sessions
 - Separating input collection from data logic for cleaner, reusable code
 - Applying the DRY principle in a real project
-
