@@ -80,29 +80,46 @@ while(userIsActive)
             // Update occurrence
             Console.WriteLine("Enter the habit name you want to update");
             string name = Console.ReadLine();
-            Console.WriteLine("Enter the the number of times you have now completed the habit");
-            string newOccurence = Console.ReadLine();
+            
 
-            while (!newOccurence.All(char.IsAsciiDigit))
+            if (db.CheckHabitExists(name))
             {
-                Console.WriteLine("Please only insert a number");
-                newOccurence = Console.ReadLine();
+                Console.WriteLine("Enter the the number of times you have now completed the habit");
+                string newOccurence = Console.ReadLine();
+
+                while (!newOccurence.All(char.IsAsciiDigit))
+                {
+                    Console.WriteLine("Please only insert a number");
+                    newOccurence = Console.ReadLine();
+                }
+
+                int newOccurenceOut;
+                Int32.TryParse(newOccurence, out newOccurenceOut);
+
+                db.UpdateHabitOccurrence(name, newOccurenceOut);
             }
-
-            int newOccurenceOut;
-            Int32.TryParse(newOccurence, out newOccurenceOut);
-
-            db.UpdateHabitOccurrence(name, newOccurenceOut);
+            else
+            {
+                Console.WriteLine($"Habit '{name}' does not exist.");
+            }
 
             break;
         case "D":
             // Delete habit
             Console.WriteLine("Which habit would you like to delete?");
             string habitToDelete = Console.ReadLine();
-            db.DeleteHabit(habitToDelete);
+
+            if (db.CheckHabitExists(habitToDelete))
+            {
+                db.DeleteHabit(habitToDelete);
+            }
+            else
+            {
+                Console.WriteLine($"Habit '{habitToDelete}' does not exist.");
+            }
             break;
         default:
-            //
+            Console.WriteLine("Invalid option. Please try again.");
             break;
     }
 

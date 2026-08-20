@@ -171,5 +171,33 @@ namespace Habit.Tracker
                 Console.WriteLine($"Error: {ex.Message}");
             }
         }
+
+        public bool CheckHabitExists(string habitName)
+        {
+            bool habitExists = false;
+
+            string sql = "SELECT COUNT(*) FROM Habits WHERE LOWER(name) = LOWER(@Name)";
+
+            try
+            {
+                using (var con = new SqliteConnection(_connectionString))
+                {
+                    con.Open();
+                    using (var cmd = new SqliteCommand(sql, con))
+                    {
+                        cmd.Parameters.AddWithValue("@Name", habitName);
+                        var count = Convert.ToInt32(cmd.ExecuteScalar());
+                        habitExists = count > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            return habitExists;
+        }
+
     }
 }
