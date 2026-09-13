@@ -75,6 +75,11 @@ namespace habit_tracker
             bool closeApp = false;
 
             List<Habits> habitList = GetAllHabits();
+
+            if(habitList.Count == 0)
+            {
+                return;
+            }
             
             
             int choice = GetNumInputForHabits("Select the habit ID to edit records.");
