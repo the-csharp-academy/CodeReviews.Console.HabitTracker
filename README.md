@@ -15,3 +15,19 @@ Regarding LINQ and testing: I haven't learned how to write unit tests yet, so I 
 - **Language**: C# / .NET 8
 - **Database**: SQLite
 - **IDE** Visual Studio 
+
+# Features
+
+The application provides an interactive CLI menu with full CRUD functionality:
+
+- **View Records**: Displays all logged habit entries from the SQLite database.
+- **Insert Record**: Allows users to log a new entry (date and quantity/duration).
+- **Update Record**: Modifies existing records based on entry ID.
+- **Delete Record**: Removes specified habit logs permanently.
+- **Input Validation**: Prevents invalid date formats and non-numeric values from crashing the application.
+
+# Running the Application
+dotnet run --project habit-tracker
+
+# Test
+dotnet test
