@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TCSA.HabitTracker": {
+      "commandName": "Project",
+      "workingDirectory": "E:\\csharplearning\\CsharpAcademy\\TCSA.HabitTracker\\"
+    }
+  }
+}
