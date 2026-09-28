@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using Spectre.Console;
 
 namespace HabitTracker.Model.Db;
 
@@ -12,16 +13,33 @@ public class SqliteRepository
 
         if (File.Exists(builder.DataSource)) return; //Already exists, no need to create and populate
 
-        CreateTable();
-        new SeedDataBase().Seed(_connectionString);
+        try
+        {
+            CreateTable();
+            new SeedDataBase().Seed(_connectionString);    
+        }
+        catch(Exception ex)
+        {
+            AnsiConsole.WriteLine($"[red]An exception happen when creating repository.[/]");
+        }
+        
     }
-    
-    public IEnumerable<Habit> GetHabits()
+
+    public IEnumerable<Habit> GetHabits(int? id = null)
     {
+        string baseQuery = "SELECT Id, Name, Quantity, OccurrenceAt FROM Habits";
+
         using SqliteConnection con = new(_connectionString);
         con.Open();
         SqliteCommand cmd = con.CreateCommand();
-        cmd.CommandText = "SELECT Id, Name, Quantity, OccurrenceAt FROM Habits;";
+
+        if (id != null)
+        {
+            baseQuery = baseQuery + $" WHERE Id = @id";
+            cmd.Parameters.AddWithValue("@id", id);
+        }
+
+        cmd.CommandText = baseQuery;
         using SqliteDataReader reader = cmd.ExecuteReader();
 
         List<Habit> list = [];
@@ -78,7 +96,7 @@ public class SqliteRepository
         using SqliteConnection con = new(_connectionString);
         con.Open();
         SqliteCommand cmd = con.CreateCommand();
-        cmd.CommandText = "DELETE FROM Habits WHERE Id = $id;";
+        cmd.CommandText = "DELETE FROM Habits WHERE Id = @id;";
         cmd.Parameters.AddWithValue("@id", id);
         return cmd.ExecuteNonQuery();
     }
@@ -90,7 +108,7 @@ public class SqliteRepository
                                  (
                                      Id INTEGER PRIMARY KEY,
                                      Name TEXT NOT NULL,
-                                     Quantity REAL NOT NULL,
+                                     Quantity INTEGER NOT NULL,
                                      OccurrenceAt TEXT NOT NULL
                                  )
                                """;
