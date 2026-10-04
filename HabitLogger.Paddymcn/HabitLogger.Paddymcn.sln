@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HabitLogger.Paddymcn", "HabitLogger.Paddymcn\HabitLogger.Paddymcn.csproj", "{6EBF4192-1A55-4A06-9A3D-A4EE96040B23}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6EBF4192-1A55-4A06-9A3D-A4EE96040B23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EBF4192-1A55-4A06-9A3D-A4EE96040B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EBF4192-1A55-4A06-9A3D-A4EE96040B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EBF4192-1A55-4A06-9A3D-A4EE96040B23}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
