@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "Habit.Logger": {
+      "commandName": "Project",
+      "workingDirectory": "F:\\.NET-Projects\\HabitLogger"
+    }
+  }
+}
